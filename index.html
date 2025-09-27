@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Калькулятор інвестицій</title>
+  <meta name="color-scheme" content="light dark">
+  <style>
+    :root{ --bg:#fff; --fg:#0f172a; --muted:#f1f5f9; --line:#e2e8f0; --hint:#fef9c3; }
+    @media (prefers-color-scheme: dark){
+      :root{ --bg:#0b0f19; --fg:#e5e7eb; --muted:#111827; --line:#1f2937; --hint:#3a3002; }
+    }
+    *{ box-sizing:border-box; }
+    body { background:var(--bg); color:var(--fg); font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif; margin:16px; }
+    h2 { margin:0 0 12px; }
+    .card { border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:16px; background:var(--bg); }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .row3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    label { font-size:14px; opacity:.95; display:block; margin-bottom:6px; }
+    label small{ opacity:.65; font-weight:500; }
+    input, select { width:100%; padding:10px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--fg); }
+    button { padding:12px 16px; border-radius:12px; border:1px solid var(--line); cursor:pointer; background:var(--fg); color:var(--bg); }
+    .muted { background:var(--muted); color:var(--fg); }
+    .summary { font-weight:600; line-height:1.5; }
+    .pill { padding:4px 8px; border-radius:999px; background:#eef2ff22; display:inline-block; font-size:12px; border:1px dashed var(--line); }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th, td { padding:6px 8px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap; }
+    th:first-child, td:first-child { text-align:left; }
+    .stack{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .diff { padding:10px; border-radius:12px; background:var(--muted); }
+    .hint { background:var(--hint); border:1px dashed var(--line); }
+    .help { font-size:12px; opacity:.75; margin-top:6px; }
+  </style>
+  <!-- Telegram Mini App SDK (не заважає у звичайному браузері) -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <h2>Калькулятор відсотків та реінвестування</h2>
+
+  <!-- Інструкція -->
+  <div class="card hint">
+    <b>Як користуватись:</b><br>
+    1️⃣ Оберіть <b>валюту</b> та <b>горизонт</b> (місяці/роки/десятиліття).<br>
+    2️⃣ Вкажіть <b>стартову суму</b> і, за потреби, <b>щомісячний внесок</b>.<br>
+    3️⃣ Задайте <b>річну ставку</b> і як часто нараховуються % (капіталізація).<br>
+    4️⃣ (Опціонально) Додайте <b>податок</b> і <b>інфляцію</b> для реалістики.<br>
+    5️⃣ Натисніть <b>«Розрахувати»</b> — отримаєте <i>Реінвест</i> та <i>Вивід %</i> + різницю.<br>
+    6️⃣ За бажанням <b>експортуйте CSV</b> або <b>надішліть результат у бот</b> для збереження/консультації.
+  </div>
+
+  <!-- Параметри -->
+  <div class="card">
+    <div class="row3">
+      <div>
+        <label>Валюта <small>(UAH / USD / EUR)</small></label>
+        <select id="currency" title="Оберіть валюту відображення">
+          <option value="UAH" selected>₴ UAH</option>
+          <option value="USD">$ USD</option>
+          <option value="EUR">€ EUR</option>
+        </select>
+      </div>
+      <div>
+        <label>Горизонт вимірювання <small>(одиниця)</small></label>
+        <select id="horizonUnit" title="У чому вимірюємо загальний строк">
+          <option value="months">місяці</option>
+          <option value="years" selected>роки</option>
+          <option value="decades">десятиліття</option>
+        </select>
+        <div class="help">Напр., «5 років» або «2 десятиліття» = 20 років.</div>
+      </div>
+      <div>
+        <label>Кількість періодів <small>(за обраною одиницею)</small></label>
+        <input id="horizonCount" type="number" min="1" step="1" value="5" title="Скільки місяців/років/десятиліть рахувати">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Стартова сума <small>(початковий депозит)</small></label>
+        <input id="p0" type="number" min="0" step="0.01" value="1000" title="Сума, з якої стартуємо">
+      </div>
+      <div>
+        <label>Щомісячний внесок <small>(додатково щомісяця)</small></label>
+        <input id="pmt" type="number" min="0" step="0.01" value="100" title="0 — якщо без довнесків">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Річна ставка, % <small>(наприклад, 12)</small></label>
+        <input id="rate" type="number" min="0" step="0.01" value="12" title="Номінальна річна ставка">
+        <div class="help">Ставка завжди річна. Капіталізація нижче визначає частоту нарахувань.</div>
+      </div>
+      <div>
+        <label>Капіталізація <small>(нарахувань за рік)</small></label>
+        <select id="m" title="Як часто нараховуються відсотки">
+          <option value="12" selected>Щомісячна</option>
+          <option value="4">Щоквартальна</option>
+          <option value="1">Річна</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Податок на дохід, % <small>(опц.)</small></label>
+        <input id="tax" type="number" min="0" step="0.01" value="0" title="Напр., для України 19.5">
+      </div>
+      <div>
+        <label>Інфляція, % <small>(опц.)</small></label>
+        <input id="infl" type="number" min="0" step="0.01" value="0" title="Щорічна інфляція для оцінки реальної купівельної спроможності">
+      </div>
+    </div>
+
+    <div class="stack" style="margin-top:12px;">
+      <button id="calcBtn" title="Розрахувати обидва сценарії">Розрахувати</button>
+      <button class="muted" id="sendBtn" disabled title="Надіслати результат у Telegram-бот">Надіслати в бот</button>
+      <button class="muted" id="csvReBtn" disabled title="Завантажити CSV для Реінвест">CSV (Реінвест)</button>
+      <button class="muted" id="csvWdBtn" disabled title="Завантажити CSV для Вивід %">CSV (Вивід %)</button>
+    </div>
+  </div>
+
+  <!-- Результати -->
+  <div class="card grid2">
+    <div>
+      <div class="pill">Реінвест</div>
+      <div id="summaryRe" class="summary">—</div>
+    </div>
+    <div>
+      <div class="pill">Вивід відсотків</div>
+      <div id="summaryWd" class="summary">—</div>
+    </div>
+  </div>
+
+  <div class="card diff" id="diffBox" style="display:none;"></div>
+
+  <div class="card grid2">
+    <div>
+      <div class="pill">Прев’ю перших 12 періодів — Реінвест</div>
+      <div style="overflow:auto; max-height:320px; margin-top:8px;">
+        <table id="tableRe">
+          <thead><tr>
+            <th>Період</th><th>Баланс на поч.</th><th>Внесок</th><th>Нарах. %</th><th>Вивід %</th><th>Баланс на кін.</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="pill">Прев’ю перших 12 періодів — Вивід %</div>
+      <div style="overflow:auto; max-height:320px; margin-top:8px;">
+        <table id="tableWd">
+          <thead><tr>
+            <th>Період</th><th>Баланс на поч.</th><th>Внесок</th><th>Нарах. %</th><th>Вивід %</th><th>Баланс на кін.</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Пояснення -->
+  <div class="card">
+    <b>Пояснення полів:</b>
+    <ul style="margin:8px 0 0 18px; line-height:1.5;">
+      <li><b>Стартова сума</b> — ваш початковий капітал на старті моделювання.</li>
+      <li><b>Щомісячний внесок</b> — сума, яку додаєте щомісяця (&laquo;0&raquo;, якщо без внесків).</li>
+      <li><b>Річна ставка</b> — номінальна річна %. Капіталізація визначає періодичність нарахувань.</li>
+      <li><b>Капіталізація</b> — скільки разів на рік нараховуються відсотки (1/4/12).</li>
+      <li><b>Податок</b> — утримується з відсотків на кожному нарахуванні (якщо задано).</li>
+      <li><b>Інфляція</b> — для розрахунку реальної вартості грошей на горизонті.</li>
+      <li><b>Реінвест</b> — відсотки додаються до тіла інвестиції; <b>Вивід %</b> — відсотки виводяться.</li>
+    </ul>
+    <p class="help">Порада: спробуйте різні поєднання «ставка × капіталізація × горизонт» — і подивіться, як реінвест змінює результат.</p>
+  </div>
+
+  <!-- Дисклеймер -->
+  <p style="font-size:12px;opacity:.7">
+    ℹ️ Це навчальний калькулятор. Цифри — модельні оцінки. Не є інвестрекомендацією.
+  </p>
+
+<script>
+let _payload = null;
+
+const fmtMoney = (x, cur='UAH') =>
+  new Intl.NumberFormat('uk-UA', { style:'currency', currency:cur, maximumFractionDigits:2 }).format(x);
+
+function monthsTotal(unit, count){
+  if(unit==='months') return count;
+  if(unit==='years') return count * 12;
+  if(unit==='decades') return count * 10 * 12; // 10 років у десятилітті
+  return count*12;
+}
+
+function computeScenario({P0,PMT,r,m,unit,count,taxR,infl,scenario}){
+  // загальна кількість нарахувань за весь горизонт
+  const n = Math.round( monthsTotal(unit, count) * (m/12) );
+  const i = r / m;
+
+  let balance = P0;
+  let totalContrib = P0;
+  let earnedGross = 0;
+  let withdrawn = 0;
+  const rows = [];
+
+  for (let t=1; t<=n; t++){
+    const interest = balance * i;                 // нараховані %
+    const interestAfterTax = interest * (1 - taxR); // з урахуванням податку (якщо задано)
+
+    if (scenario==='withdraw'){
+      withdrawn += interestAfterTax;              // відсотки вивели
+      balance += PMT;                             // тіло росте лише внесками
+    } else {
+      balance += interestAfterTax + PMT;          // реінвест + внесок
+    }
+    earnedGross += interest;
+    totalContrib += PMT;
+
+    if (t<=12){
+      const begin = balance - (scenario==='withdraw' ? PMT : (PMT + interestAfterTax));
+      rows.push({ period:t, begin, contrib:PMT, interest:interestAfterTax, out:(scenario==='withdraw'?interestAfterTax:0), end:balance });
+    }
+  }
+
+  const years = monthsTotal(unit, count)/12;
+  const finalGross = balance;
+  const realFinal  = infl>0 ? finalGross / Math.pow(1+infl, years) : finalGross;
+
+  return { finalGross, realFinal, totalContrib, earnedGross, withdrawn, rows };
+}
+
+function renderSummary(el, data, cur, label){
+  el.innerHTML =
+    `${label ? `Горизонт: <b>${label}</b><br>` : ''}` +
+    `Кінцева сума: <b>${fmtMoney(data.finalGross, cur)}</b><br>` +
+    `Внески за період: ${fmtMoney(data.totalContrib, cur)}<br>` +
+    `Зароблені % (брутто): ${fmtMoney(data.earnedGross, cur)}<br>` +
+    (data.realFinal !== undefined && data.realFinal !== data.finalGross ? `Реальна сума (з інфляцією): <b>${fmtMoney(data.realFinal, cur)}</b><br>` : '') +
+    (data.withdrawn ? `Виведено %: <b>${fmtMoney(data.withdrawn, cur)}</b>` : '');
+}
+
+function renderTable(tbody, rows, cur){
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.period}</td>
+      <td>${fmtMoney(r.begin, cur)}</td>
+      <td>${fmtMoney(r.contrib, cur)}</td>
+      <td>${fmtMoney(r.interest, cur)}</td>
+      <td>${fmtMoney(r.out, cur)}</td>
+      <td>${fmtMoney(r.end, cur)}</td>
+    </tr>`).join('');
+}
+
+function toCSV(arr){
+  const head = ['Період','Баланс_поч','Внесок','Нарах_%','Вивід_%','Баланс_кін'];
+  const rows = arr.map(r => [r.period, r.begin, r.contrib, r.interest, r.out, r.end]);
+  return [head, ...rows].map(row => row.join(',')).join('\n');
+}
+function download(filename, text){
+  const a = document.createElement('a');
+  a.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
+  a.setAttribute('download', filename);
+  a.click();
+}
+
+function calc(){
+  const currency = document.getElementById('currency').value;
+  const unit = document.getElementById('horizonUnit').value;
+  const count = +document.getElementById('horizonCount').value;
+
+  const P0   = +document.getElementById('p0').value || 0;
+  const PMT  = +document.getElementById('pmt').value || 0;
+  const r    = (+document.getElementById('rate').value || 0) / 100;
+  const m    = +document.getElementById('m').value;
+  const taxR = (+document.getElementById('tax').value || 0) / 100;
+  const infl = (+document.getElementById('infl').value || 0) / 100;
+
+  const label = `${count} ${unit==='months'?'міс.':unit==='years'?'р.':'десятиліть'}, капіталізація ${m}×/рік`;
+
+  // Обидва сценарії на однакових параметрах
+  const re = computeScenario({P0,PMT,r,m,unit,count,taxR,infl,scenario:'reinvest'});
+  const wd = computeScenario({P0,PMT,r,m,unit,count,taxR,infl,scenario:'withdraw'});
+
+  renderSummary(document.getElementById('summaryRe'), re, currency, label);
+  renderSummary(document.getElementById('summaryWd'), wd, currency, label);
+
+  renderTable(document.querySelector('#tableRe tbody'), re.rows, currency);
+  renderTable(document.querySelector('#tableWd tbody'), wd.rows, currency);
+
+  // Різниця між сценаріями
+  const diffBox = document.getElementById('diffBox');
+  const dfFinal = re.finalGross - wd.finalGross;
+  const dfReal  = re.realFinal  - wd.realFinal;
+  diffBox.style.display = 'block';
+  diffBox.innerHTML =
+    `<b>Різниця (Реінвест − Вивід %):</b><br>
+     За номіналом: <b>${fmtMoney(dfFinal, currency)}</b><br>` +
+    (isFinite(dfReal) ? `З урах. інфляції: <b>${fmtMoney(dfReal, currency)}</b>` : '');
+
+  // Пакет у Telegram
+  _payload = {
+    summary: {
+      currency, unit, count, m,
+      reinvest: { final: re.finalGross, real: re.realFinal, contrib: re.totalContrib, earned: re.earnedGross },
+      withdraw: { final: wd.finalGross, real: wd.realFinal, contrib: wd.totalContrib, earned: wd.earnedGross, out: wd.withdrawn },
+      diff: { final: dfFinal, real: dfReal }
+    },
+    inputs: {P0,PMT,r,m,unit,count,tax:taxR,infl},
+    tablePreview: { reinvest: re.rows, withdraw: wd.rows }
+  };
+
+  document.getElementById('sendBtn').disabled   = false;
+  document.getElementById('csvReBtn').disabled  = false;
+  document.getElementById('csvWdBtn').disabled  = false;
+}
+
+// Події
+document.getElementById('calcBtn').addEventListener('click', calc);
+
+document.getElementById('sendBtn').addEventListener('click', ()=>{
+  if(!_payload) return;
+  if (window.Telegram?.WebApp){
+    window.Telegram.WebApp.sendData(JSON.stringify(_payload));
+    window.Telegram.WebApp.close();
+  } else {
+    alert('Ця кнопка працює лише коли відкрито з Telegram.');
+  }
+});
+
+document.getElementById('csvReBtn').addEventListener('click', ()=>{
+  if(!_payload) return;
+  const csv = toCSV(_payload.tablePreview.reinvest);
+  download('invest_reinvest_preview.csv', csv);
+});
+document.getElementById('csvWdBtn').addEventListener('click', ()=>{
+  if(!_payload) return;
+  const csv = toCSV(_payload.tablePreview.withdraw);
+  download('invest_withdraw_preview.csv', csv);
+});
+</script>
+</body>
+</html>
