@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Active Invest School — калькулятор складного відсотка</title>
   <meta name="color-scheme" content="light dark" />
-  <meta name="description" content="Калькулятор складного відсотка: щомісячні внески, капіталізація, графік, цілі. Режими: підсумок, підбір внеску, початкової суми та терміну. Український інтерфейс від Active Invest School." />
+  <meta name="description" content="Два незалежні калькулятори: базовий складного відсотка та 'Цілі' (підбір внеску/терміну/старту з варіаціями). UA." />
 
   <style>
     :root{
@@ -79,22 +79,25 @@
         <img class="logo" src="assets/logo.png" alt="Active Invest School логотип" onerror="this.style.display='none'">
         <div>
           <h1>Active Invest School — калькулятор складного відсотка</h1>
-          <div class="subtitle">Щомісячні внески + частота капіталізації (Місячно / Квартально / Піврічно / Річно)</div>
+          <div class="subtitle">Два незалежні калькулятори: Базовий та 🎯 Цілі</div>
         </div>
       </div>
       <div class="hero-info">
-        <b>Як користуватись:</b> оберіть валюту, річну ставку і частоту капіталізації → задайте <b>початкову суму</b> і <b>щомісячний внесок</b> → вкажіть <b>термін інвестування</b> (роки/місяці) → натисніть <b>«Розрахувати»</b>. Нижче отримаєте суму на фініші, графік та таблицю перших 12 місяців. У блоці «🎯 Досягти цілі» можете підбирати <b>внесок</b>, <b>початкову суму</b> або <b>термін</b> під вашу мету.
+        <b>Базовий калькулятор</b>: введи P0/PMT/ставку/капіталізацію/термін — отримаєш підсумок, графік, таблицю.<br>
+        <b>🎯 Цілі</b>: працює окремо. Вкажи ціль, ставку, капіталізацію та термін (або увімкни «обчислити термін»), далі обери: <i>внесок</i>, <i>термін</i> або <i>початкову суму</i> — плюс варіації.
       </div>
     </div>
   </header>
 
   <main class="wrap">
     <div class="grid">
-      <!-- ===== Form ===== -->
+      <!-- ===== БАЗОВИЙ КАЛЬКУЛЯТОР ===== -->
       <section class="card">
-        <div class="row">
+        <div class="badge">Базовий калькулятор</div>
+
+        <div class="row" style="margin-top:6px">
           <div>
-            <label>Валюта відображення</label>
+            <label>Валюта</label>
             <select id="currency">
               <option value="UAH">₴ UAH</option>
               <option value="USD" selected>$ USD</option>
@@ -110,7 +113,7 @@
               <option value="2">Піврічно (2×/рік)</option>
               <option value="1">Річно (1×/рік)</option>
             </select>
-            <div class="hint">Внесок завжди щомісячний; капіталізація — коли саме додаються %.</div>
+            <div class="hint">Внесок завжди щомісячний; капіталізація — коли додаються %.</div>
           </div>
         </div>
 
@@ -130,13 +133,12 @@
             <label>Річна ставка, %</label>
             <input id="rate" type="number" min="0" step="0.01" value="8">
             <details class="muted-box" style="margin-top:6px">
-              <summary style="cursor:pointer"><b>Підказка про ставку на ринку</b></summary>
+              <summary style="cursor:pointer"><b>Підказка про ставку (ринкові орієнтири)</b></summary>
               <div class="hint" style="margin-top:8px; line-height:1.6">
-                • <b>Депозити / ОВДП (UA)/Treasuries (US)</b>: ~3–6% у $ (залежить від циклу ставок).<br>
-                • <b>Інвест-грейт облігації</b>: орієнтир 3–6% у $ довгостроково.<br>
-                • <b>Глобальні акції (широкий індекс)</b>: довгостроково ~6–10% у $ (номінально). Волатильність висока, по роках «стрибає».<br>
-                • <b>Збалансований портфель 60/40</b>: історично ~5–8% у $.<br>
-                Це не рекомендація: для моделювання оберіть <i>консервативну</i> ставку, перевірте декілька сценаріїв (напр. 5%, 8%, 10%).
+                • Депозити/ОВДП/Treasuries: ~3–6% у $ (залежить від циклу ставок).<br>
+                • Інвест-грейт облігації: ~3–6% у $.<br>
+                • Широкий індекс акцій: ~6–10% у $ (довгостроково; волатильність висока).<br>
+                • 60/40 портфель: ~5–8% у $. Це не рекомендація — моделюйте декілька сценаріїв (5%, 8%, 10%).
               </div>
             </details>
           </div>
@@ -155,7 +157,6 @@
                 </select>
               </div>
             </div>
-            <div class="hint">Спробуйте 3, 5, 10 років — відчуєте силу «відсотків на відсотки».</div>
           </div>
         </div>
 
@@ -165,9 +166,9 @@
         </div>
       </section>
 
-      <!-- ===== Results / Chart / Table ===== -->
+      <!-- ===== РЕЗУЛЬТАТИ / ГРАФІК / ТАБЛИЦЯ ===== -->
       <section class="card results">
-        <div><span class="badge">Результат</span></div>
+        <div><span class="badge">Результат (базовий)</span></div>
         <div class="result-box">
           <div>Через <b id="resHorizon">—</b> ви матимете</div>
           <div class="sum" id="resAmount">—</div>
@@ -178,11 +179,6 @@
           <div id="chartWrap">
             <canvas id="chart" width="900" height="300"></canvas>
             <div id="chartTip" hidden></div>
-          </div>
-          <div class="hint" style="margin-top:6px">
-            <span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px">
-              <span style="width:14px;height:3px;background:var(--brand-1);display:inline-block;border-radius:3px"></span> Баланс
-            </span>
           </div>
         </div>
 
@@ -201,7 +197,7 @@
           </table>
         </div>
 
-        <div class="hint">Показано перші 12 місяців. % нараховуються й відображаються в місяць капіталізації.</div>
+        <div class="hint">Показано перші 12 місяців. % відображаються лише в місяць капіталізації.</div>
       </section>
     </div>
 
@@ -212,37 +208,88 @@
       <a class="btn" href="https://www.instagram.com/stories/kristina_bessolova" target="_blank" rel="noopener">Отримати консультацію</a>
     </section>
 
-    <!-- ===== GOAL SEEK ===== -->
+    <!-- ===== 🎯 ЦІЛІ — ПОВНІСТЮ НЕЗАЛЕЖНИЙ КАЛЬКУЛЯТОР ===== -->
     <section class="card" style="margin:16px 0">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <span class="badge">🎯 Досягти цілі</span>
-        <div class="hint">Підбираємо умови досягнення бажаної суми на фініші</div>
+        <span class="badge">🎯 Цілі (незалежний)</span>
+        <div class="hint">Обчислюємо внесок, термін або стартову суму + варіації</div>
       </div>
 
+      <!-- Параметри «Цілей»: окрема валюта/ставка/капіталізація/термін -->
       <div class="row">
+        <div>
+          <label>Валюта (Цілі)</label>
+          <select id="goalCurrency">
+            <option value="UAH">₴ UAH</option>
+            <option value="USD" selected>$ USD</option>
+            <option value="EUR">€ EUR</option>
+          </select>
+        </div>
+        <div>
+          <label>Частота капіталізації (Цілі)</label>
+          <select id="goalM">
+            <option value="12" selected>Місячно (12×/рік)</option>
+            <option value="4">Квартально (4×/рік)</option>
+            <option value="2">Піврічно (2×/рік)</option>
+            <option value="1">Річно (1×/рік)</option>
+          </select>
+          <div class="hint">Внесок — щомісячний за замовчуванням.</div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:8px">
+        <div>
+          <label>Річна ставка, % (Цілі)</label>
+          <input id="goalRate" type="number" min="0" step="0.01" value="8">
+          <details class="muted-box" style="margin-top:6px">
+            <summary style="cursor:pointer"><b>Підказка по ставці (ринок)</b></summary>
+            <div class="hint" style="margin-top:8px; line-height:1.6">
+              • Депозити/ОВДП/Treasuries: ~3–6% у $. • Інвест-грейт облігації: ~3–6% у $.<br>
+              • Широкий індекс акцій: ~6–10% у $ (довгостроково). • Портфель 60/40: ~5–8% у $.<br>
+              Це не рекомендація; моделюйте кілька сценаріїв.
+            </div>
+          </details>
+        </div>
+        <div>
+          <label>Термін (Цілі)</label>
+          <div class="row" style="grid-template-columns:2fr 1fr">
+            <input id="goalPeriodCount" type="number" min="1" step="1" value="5">
+            <select id="goalPeriodUnit">
+              <option value="years" selected>роки</option>
+              <option value="months">місяці</option>
+            </select>
+          </div>
+          <label style="display:flex;gap:8px;align-items:center;margin-top:8px">
+            <input id="goalAutoTerm" type="checkbox"> <span class="hint">Обчислити термін автоматично</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Власне постановка задачі -->
+      <div class="row" style="margin-top:8px">
         <div>
           <label>Що порахувати</label>
           <select id="goalMode">
             <option value="PMT" selected>Щомісячний внесок (за відомої стартової суми)</option>
+            <option value="TERM">Термін (за відомих P0 і PMT)</option>
             <option value="P0">Початкова сума (за відомого щомісячного внеску)</option>
-            <option value="TERM">Термін (за відомих P0 та PMT)</option>
           </select>
-          <div class="goal-note">Модель = як у верхньому калькуляторі: щомісячні внески + капіталізація m разів/рік. Підбір — бінарний пошук.</div>
+          <div class="goal-note">Працюємо з вашими параметрами «Цілей», не з базового калькулятора.</div>
         </div>
         <div>
-          <label>Цільова сума на кінець терміну</label>
+          <label>Цільова сума</label>
           <input id="goalTarget" type="number" min="0" step="0.01" value="10000">
         </div>
       </div>
 
-      <!-- Відомі параметри -->
+      <!-- Відомі значення -->
       <div class="row" style="margin-top:8px">
-        <div id="rowKnownP0">
-          <label id="labelKnownP0">Відома стартова сума</label>
+        <div id="goalRowP0">
+          <label>Відома стартова сума (P0)</label>
           <input id="goalKnownP0" type="number" min="0" step="0.01" value="0">
         </div>
-        <div id="rowKnownPMT">
-          <label id="labelKnownPMT">Відомий щомісячний внесок</label>
+        <div id="goalRowPMT">
+          <label>Відомий щомісячний внесок (PMT)</label>
           <input id="goalKnownPMT" type="number" min="0" step="0.01" value="100">
         </div>
       </div>
@@ -256,11 +303,12 @@
             <option value="10">±10 грош. од.</option>
           </select>
         </div>
-        <div class="hint" style="display:flex;align-items:end">Ставка/капіталізація/валюта беруться з основної форми.</div>
+        <div class="hint" style="display:flex;align-items:end">У варіаціях ми рахуємо зміну терміну при різних внесках.</div>
       </div>
 
       <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap">
-        <button class="btn btn-primary" id="goalBtn">Розрахувати ціль</button>
+        <button class="btn btn-primary" id="goalBtn">Розрахувати</button>
+        <button class="btn btn-ghost" id="goalReset">Скинути «Цілі»</button>
       </div>
 
       <div id="goalOut" class="hero-info" style="margin-top:12px; display:none"></div>
@@ -269,7 +317,7 @@
 
     <!-- ===== FAQ ===== -->
     <section class="card" style="margin:16px 0">
-      <h2 style="margin:0 0 8px; font-size:20px">Міні-FAQ: складний відсоток</h2>
+      <h2 style="margin:0 0 8px; font-size:20px">Міні-FAQ</h2>
       <details style="border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--panel)">
         <summary style="cursor:pointer; font-weight:700">Що таке складний відсоток?</summary>
         <div class="hint" style="margin-top:8px">Відсотки додаються до тіла інвестиції, і далі нараховуються вже на більшу суму — «відсотки на відсотки».</div>
@@ -277,10 +325,6 @@
       <details style="border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--panel); margin-top:10px">
         <summary style="cursor:pointer; font-weight:700">Чим капіталізація відрізняється від внесків?</summary>
         <div class="hint" style="margin-top:8px">Внески — завжди щомісячні. Капіталізація визначає, коли саме нараховуються % (1/2/4/12 разів на рік). Частіша капіталізація = швидше зростання.</div>
-      </details>
-      <details style="border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--panel); margin-top:10px">
-        <summary style="cursor:pointer; font-weight:700">Чому «місячно» дає більше, ніж «річно»?</summary>
-        <div class="hint" style="margin-top:8px">Бо відсотки частіше додаються до балансу — ефект «складних %» працює частіше.</div>
       </details>
     </section>
   </main>
@@ -290,90 +334,82 @@
   </footer>
 
 <script>
-/* ===== Формат грошей ===== */
+/* ========= УТИЛІТИ ========= */
 const fmtMoney = (x, cur='UAH') => new Intl.NumberFormat('uk-UA',{style:'currency',currency:cur,maximumFractionDigits:2}).format(x);
+const monthsTotal = (unit, count) => unit==='months' ? count : count*12;
+const ymLabel = (months) => { const y=Math.floor(months/12), m=months%12; return `${months} міс. (${y} р. ${m} міс.)`; };
 
-/* ===== Допоміжні ===== */
-function monthsTotal(unit, count){ if(unit==='months')return count; if(unit==='years')return count*12; return count*12; }
-function ymLabel(months){ const y=Math.floor(months/12), m=months%12; return `${months} міс. (${y} р. ${m} міс.)`; }
-
-/* ===== Модель компаундингу (PMT щомісячно, % капіталізуються m разів/рік) ===== */
-function simulate({P0, PMT, annualRate, m, months}){
+/* ========= МОДЕЛЬ СКЛАДНОГО % =========
+   Щомісячний внесок PMT; % капіталізуються m разів/рік (кожні 12/m міс) за ставкою r/m.
+*/
+function simulate({P0, PMT, annualRate, m, months, previewRows=12}){
   const intervalMonths = Math.round(12 / m);
   const iPeriod = annualRate / m;
   let balance = P0;
   const rows=[], series=[balance];
+
   for(let t=1;t<=months;t++){
     const begin=balance;
     balance += PMT;
     let interestAdded=0;
     if(t % intervalMonths === 0){ const interest=balance*iPeriod; balance+=interest; interestAdded=interest; }
-    if(t<=12){ rows.push({month:t,begin,pmt:PMT,interest:interestAdded,end:balance}); }
+    if(t<=previewRows){ rows.push({month:t,begin,pmt:PMT,interest:interestAdded,end:balance}); }
     series.push(balance);
   }
   return {final:balance, rows, series};
 }
 
-/* ===== Знайти мінімальний термін (місяці), щоб досягти target при фіксованих P0, PMT ===== */
+/* Мінімальний місяць, щоб досягти target; якщо >maxMonths — null */
 function monthsToTarget({P0, PMT, annualRate, m, target, maxMonths=1200}){
   if(P0>=target) return 0;
-  // збільшення верхньої межі експоненційно
-  let lo=0, hi=12; // старт з року
+  let lo=0, hi=12;
   while(hi<=maxMonths && simulate({P0,PMT,annualRate,m,months:hi}).final < target) hi*=2;
-  hi=Math.min(hi, maxMonths);
-  if(simulate({P0,PMT,annualRate,m,months:hi}).final < target) return null; // не досягнемо у межах maxMonths
-  // бінарний пошук
+  hi=Math.min(hi,maxMonths);
+  if(simulate({P0,PMT,annualRate,m,months:hi}).final < target) return null;
   while(lo<hi){
     const mid=Math.floor((lo+hi)/2);
-    const f = simulate({P0,PMT,annualRate,m,months:mid}).final;
+    const f=simulate({P0,PMT,annualRate,m,months:mid}).final;
     if(f>=target) hi=mid; else lo=mid+1;
   }
   return lo;
 }
 
-/* ===== Графік (лінія + заливка + грід + тултіп) ===== */
+/* ========= БАЗОВИЙ КАЛЬКУЛЯТОР (НЕ ЗАЛЕЖИТЬ ВІД «ЦІЛЕЙ») ========= */
+let unitCurrent='years';
+document.querySelectorAll('.unit-tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{ unitCurrent=btn.dataset.unit; document.getElementById('periodUnit').value=unitCurrent;
+    document.querySelectorAll('.unit-tab').forEach(b=>b.setAttribute('aria-pressed', b===btn?'true':'false')); });
+});
+const getUnit = ()=> window.matchMedia('(min-width:560px)').matches ? unitCurrent : document.getElementById('periodUnit').value;
+
 function drawChart(series, currency){
   const canvas=document.getElementById('chart'), tip=document.getElementById('chartTip'), ctx=canvas.getContext('2d');
   const dpr=window.devicePixelRatio||1; canvas.width=canvas.clientWidth*dpr; canvas.height=canvas.clientHeight*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
   const w=canvas.clientWidth,h=canvas.clientHeight, padL=48,padR=16,padT=12,padB=32, plotW=w-padL-padR,plotH=h-padT-padB;
   const len=Math.max(series.length,2), min=Math.min(...series), max=Math.max(...series), yMin=Math.max(0,Math.floor(min)), yMax=Math.ceil(max);
   const X=i=>padL+plotW*(i/(len-1)), Y=v=>padT+plotH*(1-(v-yMin)/(yMax-yMin||1));
-  // grid
   ctx.clearRect(0,0,w,h);
   ctx.strokeStyle=getComputedStyle(document.body).getPropertyValue('--line'); ctx.lineWidth=1; ctx.beginPath();
   for(let k=0;k<=4;k++){ const y=padT+plotH*(k/4); ctx.moveTo(padL,y); ctx.lineTo(w-padR,y);} ctx.stroke();
-  // y labels
   ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--ink'); ctx.font='12px Inter, system-ui, sans-serif'; ctx.textAlign='right'; ctx.textBaseline='middle';
   for(let k=0;k<=4;k++){ const v=yMax-(yMax-yMin)*(k/4), y=padT+plotH*(k/4); ctx.fillText(shortNum(v), padL-6, y); }
-  // x labels (роки)
   ctx.textAlign='center'; ctx.textBaseline='top';
   const monthsTotal=len-1, years=Math.max(1,Math.round(monthsTotal/12));
   for(let y=0;y<=years;y++){ const i=Math.min(monthsTotal,y*12), x=X(i); ctx.fillText((y)+'р', x, h-padB+8); }
-  // area + line
   const lineColor=getComputedStyle(document.documentElement).getPropertyValue('--brand-1').trim()||'#0b8a4b';
   const grad=ctx.createLinearGradient(0,padT,0,h-padB); grad.addColorStop(0,hexToRgba(lineColor,.35)); grad.addColorStop(1,hexToRgba(lineColor,0));
   ctx.beginPath(); ctx.moveTo(X(0),Y(series[0])); for(let i=1;i<len;i++) ctx.lineTo(X(i),Y(series[i])); ctx.lineTo(X(len-1),h-padB); ctx.lineTo(X(0),h-padB); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
   ctx.strokeStyle=lineColor; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(X(0),Y(series[0])); for(let i=1;i<len;i++) ctx.lineTo(X(i),Y(series[i])); ctx.stroke();
-  // hover cache
   const base=ctx.getImageData(0,0,canvas.width/dpr,canvas.height/dpr);
   canvas.onmousemove=(e)=>{ const r=canvas.getBoundingClientRect(), x=(e.clientX-r.left); const i=Math.max(0,Math.min(len-1,Math.round((x-padL)/(plotW/(len-1))))); const cx=X(i), cy=Y(series[i]);
     ctx.putImageData(base,0,0); ctx.strokeStyle='#ffffff33'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(cx,padT); ctx.lineTo(cx,h-padB); ctx.stroke();
     ctx.fillStyle=lineColor; ctx.beginPath(); ctx.arc(cx,cy,3,0,Math.PI*2); ctx.fill();
-    tip.hidden=false; tip.textContent=`${fmtMoney(series[i], currency)} • ${i} міс.`; tip.style.left=`${cx}px`; tip.style.top=`${cy}px`; };
+    tip.hidden=false; tip.textContent=`${fmtMoney(series[i], document.getElementById('currency').value)} • ${i} міс.`; tip.style.left=`${cx}px`; tip.style.top=`${cy}px`; };
   canvas.onmouseleave=()=>{ tip.hidden=true; ctx.putImageData(base,0,0); };
   function shortNum(v){ if(v>=1e9)return(v/1e9).toFixed(1)+'B'; if(v>=1e6)return(v/1e6).toFixed(1)+'M'; if(v>=1e3)return(v/1e3).toFixed(0)+'k'; return Math.round(v).toString(); }
   function hexToRgba(hex,a){ const h=hex.replace('#',''); const bigint=parseInt(h.length===3?h.replace(/(.)/g,'$1$1'):h,16); const r=(bigint>>16)&255,g=(bigint>>8)&255,b=bigint&255; return `rgba(${r},${g},${b},${a})`; }
 }
 
-/* ===== Таби/селект одиниці ===== */
-let unitCurrent='years';
-document.querySelectorAll('.unit-tab').forEach(btn=>{
-  btn.addEventListener('click',()=>{ unitCurrent=btn.dataset.unit; document.getElementById('periodUnit').value=unitCurrent;
-    document.querySelectorAll('.unit-tab').forEach(b=>b.setAttribute('aria-pressed', b===btn?'true':'false')); });
-});
-function getUnit(){ return window.matchMedia('(min-width:560px)').matches ? unitCurrent : document.getElementById('periodUnit').value; }
-
-/* ===== Контролер: базовий калькулятор ===== */
 function calc(){
   const currency=document.getElementById('currency').value;
   const P0=+document.getElementById('p0').value||0;
@@ -398,108 +434,171 @@ function resetForm(){
   document.getElementById('periodCount').value='5'; document.getElementById('periodUnit').value='years'; unitCurrent='years';
   document.querySelectorAll('.unit-tab').forEach(b=>b.setAttribute('aria-pressed', b.dataset.unit==='years'?'true':'false'));
   document.querySelector('#preview tbody').innerHTML=''; document.getElementById('resHorizon').textContent='—'; document.getElementById('resAmount').textContent='—';
-  drawChart([0,0,0],'USD');
+  drawChart([0,0,0], document.getElementById('currency').value);
 }
 document.getElementById('calcBtn').addEventListener('click',calc);
 document.getElementById('resetBtn').addEventListener('click',resetForm);
 
-/* ===== GOAL SEEK: PMT / P0 / TERM ===== */
-function updateGoalUI(){
+/* ========= 🎯 ЦІЛІ — НЕЗАЛЕЖНИЙ КАЛЬКУЛЯТОР ========= */
+function updateGoalKnownVisibility(){
   const mode=document.getElementById('goalMode').value;
-  const rowP0=document.getElementById('rowKnownP0');
-  const rowPMT=document.getElementById('rowKnownPMT');
-  if(mode==='PMT'){ rowP0.style.display='block'; rowPMT.style.display='none'; }
-  else if(mode==='P0'){ rowP0.style.display='none'; rowPMT.style.display='block'; }
-  else { rowP0.style.display='block'; rowPMT.style.display='block'; }
+  document.getElementById('goalRowP0').style.display = (mode==='PMT'||mode==='TERM')?'block':'none';
+  document.getElementById('goalRowPMT').style.display= (mode==='P0'||mode==='TERM')?'block':'none';
 }
+document.getElementById('goalMode').addEventListener('change', updateGoalKnownVisibility);
+updateGoalKnownVisibility();
+
+function goalReset(){
+  document.getElementById('goalCurrency').value='USD';
+  document.getElementById('goalM').value='12';
+  document.getElementById('goalRate').value='8';
+  document.getElementById('goalPeriodCount').value='5';
+  document.getElementById('goalPeriodUnit').value='years';
+  document.getElementById('goalAutoTerm').checked=false;
+  document.getElementById('goalMode').value='PMT';
+  document.getElementById('goalTarget').value='10000';
+  document.getElementById('goalKnownP0').value='0';
+  document.getElementById('goalKnownPMT').value='100';
+  document.getElementById('goalEps').value='0.01';
+  updateGoalKnownVisibility();
+  document.getElementById('goalOut').style.display='none';
+  document.getElementById('goalVariants').style.display='none';
+}
+document.getElementById('goalReset').addEventListener('click', goalReset);
+
 function goalSeek(){
-  const currency=document.getElementById('currency').value;
+  const cur=document.getElementById('goalCurrency').value;
+  const m=+document.getElementById('goalM').value;
+  const r=(+document.getElementById('goalRate').value||0)/100;
+  const count=+document.getElementById('goalPeriodCount').value;
+  const unit=document.getElementById('goalPeriodUnit').value;
+  const autoTerm=document.getElementById('goalAutoTerm').checked;
   const mode=document.getElementById('goalMode').value;
   const target=+document.getElementById('goalTarget').value||0;
-  const knownP0=+document.getElementById('goalKnownP0').value||0;
-  const knownPMT=+document.getElementById('goalKnownPMT').value||0;
+  const P0=+document.getElementById('goalKnownP0').value||0;
+  const PMTknown=+document.getElementById('goalKnownPMT').value||0;
   const eps=+document.getElementById('goalEps').value||0.01;
 
-  const r=(+document.getElementById('rate').value||0)/100;
-  const m=+document.getElementById('m').value;
-  const unit=getUnit();
-  const count=+document.getElementById('periodCount').value;
-  const monthsDefault=monthsTotal(unit,count);
+  const monthsFix = monthsTotal(unit, count);
+  const monthsOrAuto = (autoTerm? null : monthsFix);
 
-  if(target<=0){ return showGoal('Вкажіть додатну цільову суму.', true); }
+  if(target<=0){ return showGoal('goalOut','Вкажіть додатну цільову суму.', true); }
 
-  function finalWithMonths(P0,PMT,months){ return simulate({P0,PMT,annualRate:r,m,months}).final; }
+  function fFinal(P0,PMT,months){ return simulate({P0,PMT,annualRate:r,m,months}).final; }
   function bracket(fn, lo=0){ let hi=1; while(fn(hi)<target && hi<1e12) hi*=2; return [lo,hi]; }
 
-  let html='', addBox='';
+  let html='', variantsHTML='', minMonths=null;
+
   if(mode==='PMT'){
-    // 1) підбір потрібного PMT під заданий термін
-    const P0=knownP0, months=monthsDefault;
-    const valPMT=(PMT)=>finalWithMonths(P0,PMT,months);
+    // 1) підбір PMT під фіксований термін, або підбір PMT + мін. термін якщо autoTerm
     let PMTreq=0;
-    if(valPMT(0)>=target){ PMTreq=0; }
-    else { let [lo,hi]=bracket(valPMT,0); for(let it=0;it<200;it++){ const mid=(lo+hi)/2, f=valPMT(mid); if(Math.abs(f-target)<=eps){PMTreq=mid;break;} (f<target)?(lo=mid):(hi=mid); PMTreq=mid; } }
+    if(monthsOrAuto){ // фіксований термін
+      const months=monthsOrAuto;
+      const val=(PMT)=>fFinal(P0,PMT,months);
+      if(val(0)>=target){ PMTreq=0; }
+      else { let [lo,hi]=bracket(val,0); for(let it=0;it<200;it++){ const mid=(lo+hi)/2, f=val(mid); if(Math.abs(f-target)<=eps){PMTreq=mid;break;} (f<target)?(lo=mid):(hi=mid); PMTreq=mid; } }
+      html = `Потрібний <b>щомісячний внесок</b> для ${unit==='years'?`${count} років`:`${count} місяців`}: <span class="mono">${fmtMoney(PMTreq,cur)}</span>`;
+      // мін. термін при цьому внеску (опціонально для порівняння)
+      const minM = monthsToTarget({P0, PMT:PMTreq, annualRate:r, m, target});
+      html += `<br>Мінімальний <b>термін</b> при цьому внеску: <b>${minM===null?'недосяжно':ymLabel(minM)}</b>`;
+    } else {
+      // підбираємо PMT і одразу мінімальний термін для нього (щоб досягнути рівно target)
+      // стратегія: спершу підберемо мінімальний термін для декількох PMT і знайдемо PMT із найкоротшим терміном ≈ найменше PMT? Ні: юзер просив «скільки треба вносити щомісячно» + «скільки часу потрібно».
+      // Робимо так: підберемо PMT для "орієнтовного" терміну (почнемо з 12 міс), потім порахуємо мінімальний термін при цьому PMT.
+      const monthsGuess=12;
+      const val=(PMT)=>fFinal(P0,PMT,monthsGuess);
+      if(val(0)>=target){ PMTreq=0; }
+      else { let [lo,hi]=bracket(val,0); for(let it=0;it<200;it++){ const mid=(lo+hi)/2, f=val(mid); if(Math.abs(f-target)<=eps){PMTreq=mid;break;} (f<target)?(lo=mid):(hi=mid); PMTreq=mid; } }
+      minMonths = monthsToTarget({P0, PMT:PMTreq, annualRate:r, m, target});
+      html = `Потрібний <b>щомісячний внесок</b>: <span class="mono">${fmtMoney(PMTreq,cur)}</span><br>
+              Мінімальний <b>термін</b> при цьому внеску: <b>${minMonths===null?'недосяжно':ymLabel(minMonths)}</b>`;
+    }
 
-    // 2) одразу рахуємо мінімальний термін для цього PMT (щоб досягти target)
-    const minMonths = monthsToTarget({P0, PMT:PMTreq, annualRate:r, m, target});
-    const minTermText = (minMonths===null) ? 'не досягненно у розумні строки' : ymLabel(minMonths);
-
-    html = `Потрібний <b>щомісячний внесок</b>: <span class="mono">${fmtMoney(PMTreq, currency)}</span><br>
-           Мінімальний <b>термін</b> при такому внеску: <b>${minTermText}</b>`;
-
-    // 3) варіації внеску і як зміниться термін
-    const factors = [
-      {label:'−20%', k:0.8},
-      {label:'базовий', k:1.0},
-      {label:'+20%', k:1.2},
-      {label:'+50%', k:1.5},
-      {label:'×2', k:2.0},
-    ];
-    const rows = factors.map(f=>{
-      const months = monthsToTarget({P0, PMT: PMTreq*f.k, annualRate:r, m, target});
-      return `<tr><td>${f.label}</td><td class="mono">${fmtMoney(PMTreq*f.k, currency)}</td><td>${months===null?'—':ymLabel(months)}</td></tr>`;
+    // 2) варіації за внеском → термін
+    const basePMT = PMTreq;
+    const variants=[{label:'−20%',k:0.8},{label:'базовий',k:1.0},{label:'+20%',k:1.2},{label:'+50%',k:1.5},{label:'×2',k:2.0}];
+    const rows=variants.map(v=>{
+      const mths=monthsToTarget({P0, PMT:basePMT*v.k, annualRate:r, m, target});
+      return `<tr><td>${v.label}</td><td class="mono">${fmtMoney(basePMT*v.k,cur)}</td><td>${mths===null?'—':ymLabel(mths)}</td></tr>`;
     }).join('');
-    addBox = `<div style="margin-top:10px">
-      <b>Варіації за внеском (з урахуванням складного %):</b>
-      <div class="hint">Показуємо, як зміниться мінімальний термін при зміні щомісячного внеску.</div>
-      <div class="table-wrap" style="max-height:none; margin-top:6px">
-        <table style="font-size:13px">
-          <thead><tr><th>Сценарій</th><th>Внесок/міс</th><th>Мін. термін до цілі</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </div>`;
-  } else if(mode==='P0'){
-    const PMT=knownPMT, months=monthsDefault;
-    const valP0=(P0)=>finalWithMonths(P0,PMT,months);
-    let P0req=0;
-    if(valP0(0)>=target){ P0req=0; }
-    else { let [lo,hi]=bracket(valP0,0); for(let it=0;it<200;it++){ const mid=(lo+hi)/2, f=valP0(mid); if(Math.abs(f-target)<=eps){P0req=mid;break;} (f<target)?(lo=mid):(hi=mid); P0req=mid; } }
-    const minMonths = monthsToTarget({P0:P0req, PMT, annualRate:r, m, target});
-    html = `Потрібна <b>початкова сума</b>: <span class="mono">${fmtMoney(P0req, currency)}</span><br>
-            Мінімальний <b>термін</b> при такому внеску: <b>${minMonths===null?'не досягненно':ymLabel(minMonths)}</b>`;
-  } else {
-    const P0=knownP0, PMT=knownPMT;
-    const months = monthsToTarget({P0, PMT, annualRate:r, m, target});
-    if(months===null){ html=`З цими параметрами ціль <b>не досягненно</b> у межах 100 років.`; }
-    else {
-      const final = simulate({P0, PMT, annualRate:r, m, months}).final;
-      html = `Мінімальний <b>термін</b>: <span class="mono">${ymLabel(months)}</span><br>
-              Очікуваний баланс на фініші: <b>${fmtMoney(final, currency)}</b>`;
+    variantsHTML = tableBox('Варіації за внеском (ефект складного %)', rows, ['Сценарій','Внесок/міс','Мін. термін до цілі']);
+
+  } else if(mode==='TERM'){
+    // мінімальний термін при відомих P0 та PMT
+    minMonths = monthsToTarget({P0, PMT:PMTknown, annualRate:r, m, target});
+    html = minMonths===null
+      ? `З цими параметрами ціль <b>не досягненно</b> у межах 100 років.`
+      : `Мінімальний <b>термін</b>: <span class="mono">${ymLabel(minMonths)}</span>`;
+
+    // варіації PMT → термін
+    const variants=[{label:'−20%',k:0.8},{label:'базовий',k:1.0},{label:'+20%',k:1.2},{label:'+50%',k:1.5},{label:'×2',k:2.0}];
+    const rows=variants.map(v=>{
+      const mths=monthsToTarget({P0, PMT:PMTknown*v.k, annualRate:r, m, target});
+      return `<tr><td>${v.label}</td><td class="mono">${fmtMoney(PMTknown*v.k,cur)}</td><td>${mths===null?'—':ymLabel(mths)}</td></tr>`;
+    }).join('');
+    variantsHTML = tableBox('Як зміниться термін при іншому внеску', rows, ['Сценарій','Внесок/міс','Мін. термін']);
+
+  } else { // P0
+    if(monthsOrAuto){
+      const months=monthsOrAuto;
+      const val=(P0x)=>fFinal(P0x,PMTknown,months);
+      let P0req=0;
+      if(val(0)>=target){ P0req=0; }
+      else { let [lo,hi]=bracket(val,0); for(let it=0;it<200;it++){ const mid=(lo+hi)/2, f=val(mid); if(Math.abs(f-target)<=eps){P0req=mid;break;} (f<target)?(lo=mid):(hi=mid); P0req=mid; } }
+      html = `Потрібна <b>початкова сума</b> для ${unit==='years'?`${count} років`:`${count} місяців`}: <span class="mono">${fmtMoney(P0req,cur)}</span>`;
+
+      // варіації PMT → як зміниться потрібна стартова сума
+      const variants=[{label:'−20%',k:0.8},{label:'базовий',k:1.0},{label:'+20%',k:1.2},{label:'+50%',k:1.5},{label:'×2',k:2.0}];
+      const rows=variants.map(v=>{
+        const val2=(P0x)=>fFinal(P0x,PMTknown*v.k,months);
+        let need=0;
+        if(val2(0)>=target){ need=0; }
+        else { let [lo,hi]=bracket(val2,0); for(let it=0;it<200;it++){ const mid=(lo+hi)/2, f=val2(mid); if(Math.abs(f-target)<=eps){need=mid;break;} (f<target)?(lo=mid):(hi=mid); need=mid; } }
+        return `<tr><td>${v.label}</td><td class="mono">${fmtMoney(PMTknown*v.k,cur)}</td><td class="mono">${fmtMoney(need,cur)}</td></tr>`;
+      }).join('');
+      variantsHTML = tableBox('Як зміниться потрібна стартова сума при іншому внеску', rows, ['Сценарій','Внесок/міс','Потрібна стартова сума']);
+    } else {
+      // auto term: обчислити мін. термін для даних P0, PMTknown; а потім опціонально показати, яку P0 треба при нульовому терміні (не має сенсу) — краще показати «термін» і варіації PMT.
+      minMonths = monthsToTarget({P0, PMT:PMTknown, annualRate:r, m, target});
+      html = minMonths===null
+        ? `З цими параметрами ціль <b>не досягненно</b> у межах 100 років.`
+        : `Мінімальний <b>термін</b> з вашою стартовою сумою та внеском: <span class="mono">${ymLabel(minMonths)}</span>`;
+
+      const variants=[{label:'−20%',k:0.8},{label:'базовий',k:1.0},{label:'+20%',k:1.2},{label:'+50%',k:1.5},{label:'×2',k:2.0}];
+      const rows=variants.map(v=>{
+        const mths=monthsToTarget({P0, PMT:PMTknown*v.k, annualRate:r, m, target});
+        return `<tr><td>${v.label}</td><td class="mono">${fmtMoney(PMTknown*v.k,cur)}</td><td>${mths===null?'—':ymLabel(mths)}</td></tr>`;
+      }).join('');
+      variantsHTML = tableBox('Як зміниться термін при іншому внеску', rows, ['Сценарій','Внесок/міс','Мін. термін']);
     }
   }
 
-  showGoal(html,false);
-  const boxVar=document.getElementById('goalVariants');
-  if(addBox){ boxVar.style.display='block'; boxVar.innerHTML=addBox; } else { boxVar.style.display='none'; boxVar.innerHTML=''; }
+  showGoal('goalOut', html, false);
+  const box=document.getElementById('goalVariants');
+  if(variantsHTML){ box.style.display='block'; box.innerHTML=variantsHTML; } else { box.style.display='none'; box.innerHTML=''; }
 }
-function showGoal(html,warn=false){ const box=document.getElementById('goalOut'); box.style.display='block'; box.style.borderColor= warn?'var(--warn)':'var(--line)'; box.innerHTML=html; }
-
-document.getElementById('goalMode').addEventListener('change', updateGoalUI);
 document.getElementById('goalBtn').addEventListener('click', goalSeek);
-updateGoalUI();
 
-// init
+function tableBox(title, rowsHTML, headers){
+  return `<div style="margin-top:10px">
+    <b>${title}</b>
+    <div class="table-wrap" style="max-height:none; margin-top:6px">
+      <table style="font-size:13px">
+        <thead><tr>${headers.map(h=>`<th style="text-align:left">${h}</th>`).join('')}</tr></thead>
+        <tbody>${rowsHTML}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function showGoal(id, html, warn){
+  const box=document.getElementById(id);
+  box.style.display='block';
+  box.style.borderColor = warn ? 'var(--warn)' : 'var(--line)';
+  box.innerHTML=html;
+}
+
+/* ініціалізація графіка (порожній для базового) */
 window.addEventListener('load', ()=> drawChart([0,0,0], document.getElementById('currency').value));
 </script>
 </body>
