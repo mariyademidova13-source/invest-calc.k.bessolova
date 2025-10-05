@@ -3,89 +3,116 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Калькулятор складного відсотка — Інвестиції Крістіна</title>
+  <title>Active Invest School — калькулятор складного відсотка</title>
   <meta name="color-scheme" content="light dark" />
-  <meta name="description" content="Український калькулятор складного відсотка: щомісячні внески, вибір частоти капіталізації, графік зростання та підсумок." />
+  <meta name="description" content="Калькулятор складного відсотка: щомісячні внески, частота капіталізації, графік зростання, результат. Український інтерфейс від Active Invest School." />
+
   <style>
     :root{
-      --brand-1:#0b8a4b;   /* зелений */
-      --brand-2:#003906;   /* темний зелений */
-      --brand-3:#295e4c;   /* глибокий зелений */
-      --accent-1:#b67900;  /* золото */
-      --accent-2:#d3a000;  /* світліше золото */
+      /* Бренд */
+      --brand-1:#0b8a4b;  /* зелений */
+      --brand-2:#003906;  /* темний зелений */
+      --brand-3:#295e4c;  /* глибокий зелений */
+      --accent-1:#b67900; /* золото */
+      --accent-2:#d3a000;
 
-      --bg-1:#faf6cf; --bg-2:#f1dcc2; --bg-3:#f4f6cf;
-
-      --ink:#0f172a; --muted:#4b5563; --line:#e5e7eb;
-      --page:#ffffff; --panel:#ffffff;
+      /* Темна тема за замовчуванням */
+      --ink:#e5e7eb;
+      --muted:#9ca3af;
+      --line:#24303a;
+      --page:#0b0f19;
+      --panel:#0f1623;
     }
-    @media (prefers-color-scheme: dark){
-      :root{
-        --ink:#e5e7eb; --muted:#9ca3af; --line:#24303a;
-        --page:#0b0f19; --panel:#0f1623;
-        --bg-1:#0f2419; --bg-2:#201a12; --bg-3:#1a2010;
-      }
-    }
-
     *{ box-sizing:border-box }
-    html,body{ margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color:var(--ink); background:var(--page) }
+    html,body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      color:var(--ink); background:var(--page)
+    }
 
-    header{ background: linear-gradient(135deg, var(--brand-2), var(--brand-3)); color:#fff; }
+    /* ===== Header ===== */
+    header{ background:linear-gradient(135deg,var(--brand-2),var(--brand-3)); color:#fff }
     .wrap{ max-width:1000px; margin:0 auto; padding:16px }
-    .topbar{ display:flex; align-items:center; gap:12px; }
+    .topbar{ display:flex; align-items:center; gap:12px }
     .logo{ width:40px; height:40px; border-radius:8px; object-fit:contain; background:#fff1; padding:4px }
-    h1{ margin:4px 0 0; font-size:24px; line-height:1.2; }
-    .subtitle{ opacity:.9; margin-top:4px }
-    .hero-info{ background: linear-gradient(180deg, var(--bg-1), #ffffff00); border:1px solid var(--line); border-radius:16px; padding:14px; margin-top:12px; }
+    h1{ margin:4px 0 0; font-size:22px; line-height:1.25 }
+    .subtitle{ opacity:.9; margin-top:4px; font-size:14px }
+    .hero-info{
+      background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0));
+      border:1px solid var(--line); border-radius:16px; padding:14px; margin-top:12px; font-size:14px
+    }
+    @media (max-width:420px){ h1{ font-size:18px } }
 
+    /* ===== Layout ===== */
     .grid{ display:grid; gap:16px; grid-template-columns:1fr; padding:16px }
     @media (min-width:960px){ .grid{ grid-template-columns:1.2fr .8fr } }
 
     .card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px }
-    .row{ display:grid; gap:12px; grid-template-columns:1fr; }
-    @media (min-width:640px){ .row{ grid-template-columns:1fr 1fr } }
+    .row{ display:grid; gap:12px; grid-template-columns:1fr }
+    @media (min-width:680px){ .row{ grid-template-columns:1fr 1fr } }
     label{ display:block; font-size:14px; font-weight:600; margin-bottom:6px }
-    input, select{ width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:var(--panel); color:var(--ink); font-size:16px; }
+    input, select{
+      width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line);
+      background:var(--panel); color:var(--ink); font-size:16px; min-width:0;
+    }
     .hint{ font-size:12px; color:var(--muted); margin-top:6px }
 
     .btn{ appearance:none; border:0; border-radius:12px; padding:14px 16px; font-weight:700; cursor:pointer }
     .btn-primary{ background:var(--accent-2); color:#1a1a1a }
     .btn-primary:hover{ background:var(--accent-1) }
-    .btn-ghost{ background:var(--bg-3); color:#243b2f; border:1px dashed #00000022 }
+    .btn-ghost{ background:#111826; color:#cbd5e1; border:1px dashed #ffffff26 }
+    @media (max-width:560px){ .btn{ width:100% } }
 
+    /* ===== Results ===== */
     .results{ display:flex; flex-direction:column; gap:12px }
     .badge{ display:inline-block; padding:4px 8px; border-radius:999px; background:#ffffff20; border:1px dashed #ffffff40; font-size:12px }
-    .result-box{ background:linear-gradient(135deg, var(--brand-1), var(--brand-3)); color:#fff; border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:6px; }
-    .result-box .sum{ font-size:36px; font-weight:800 }
+    .result-box{ background:linear-gradient(135deg,var(--brand-1),var(--brand-3)); color:#fff; border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:6px }
+    .result-box .sum{ font-size:32px; font-weight:800 }
 
+    /* ===== Chart ===== */
+    .chart-card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px }
+    #chartWrap{ position:relative }
+    canvas{ width:100%; height:280px; display:block; border:1px solid var(--line); border-radius:12px; background:var(--panel) }
+    #chartTip{
+      position:absolute; pointer-events:none; transform:translate(-50%,-110%);
+      background:#111; color:#fff; padding:6px 8px; border-radius:8px;
+      font-size:12px; white-space:nowrap; border:1px solid #ffffff22; box-shadow:0 4px 14px #0005;
+    }
+    #chartTip::after{
+      content:""; position:absolute; left:50%; bottom:-6px; transform:translateX(-50%);
+      border:6px solid transparent; border-top-color:#111;
+    }
+
+    /* ===== Table ===== */
     .table-wrap{ overflow:auto; max-height:340px; border:1px solid var(--line); border-radius:12px; background:var(--panel) }
     table{ width:100%; border-collapse:collapse; font-size:12px }
     th,td{ padding:8px 10px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap }
     th:first-child,td:first-child{ text-align:left }
 
-    /* Графік */
-    .chart-card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px; }
-    canvas{ width:100%; height:280px; display:block; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
-
-    /* CTA */
-    .cta{ background: linear-gradient(135deg, var(--brand-1), var(--brand-3)); color:#fff; border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:8px; align-items:flex-start }
-    .cta .btn{ background:#fff; color:#133; }
+    /* ===== CTA ===== */
+    .cta{ background:linear-gradient(135deg,var(--brand-1),var(--brand-3)); color:#fff; border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:8px; align-items:flex-start }
+    .cta .btn{ background:#fff; color:#133 }
     .cta .btn:hover{ background:#f8f8f8 }
 
-    /* FAQ */
-    .faq details{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--panel) }
-    .faq summary{ cursor:pointer; font-weight:700 }
-    .faq details+details{ margin-top:10px }
-    footer{ text-align:center; font-size:12px; color:var(--muted); padding:20px 16px }
+    /* ===== Unit tabs vs select ===== */
+    .unit-wrap{ display:flex; flex-direction:column; gap:6px }
+    .unit-tabs{ display:none; gap:8px }
+    .unit-tab{
+      flex:1; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+      background:var(--panel); color:var(--ink); cursor:pointer; font-weight:600; width:100%
+    }
+    .unit-tab[aria-pressed="true"]{ background:var(--accent-2); color:#111; border-color:transparent }
+    .unit-select{ display:block }
+    @media (min-width:560px){ .unit-tabs{ display:flex } .unit-select{ display:none } }
   </style>
 </head>
+
 <body>
   <header>
     <div class="wrap">
       <div class="topbar">
         <img class="logo" src="assets/logo.png" alt="Active Invest School логотип" onerror="this.style.display='none'">
         <div>
-          <h1>Інвестиції Крістіна — калькулятор складного відсотка</h1>
+          <h1>Active Invest School — калькулятор складного відсотка</h1>
           <div class="subtitle">Щомісячні внески + частота капіталізації (Місячно / Квартально / Піврічно / Річно)</div>
         </div>
       </div>
@@ -95,7 +122,7 @@
 
   <main class="wrap">
     <div class="grid">
-      <!-- Форма -->
+      <!-- ===== Form ===== -->
       <section class="card">
         <div class="row">
           <div>
@@ -106,6 +133,7 @@
               <option value="EUR">€ EUR</option>
             </select>
           </div>
+
           <div>
             <label>Частота капіталізації</label>
             <select id="m">
@@ -135,13 +163,21 @@
             <input id="rate" type="number" min="0" step="0.01" value="8">
           </div>
           <div>
-            <label>Горизонт</label>
+            <label>Термін інвестування</label>
             <div class="row" style="grid-template-columns:2fr 1fr">
               <input id="periodCount" type="number" min="1" step="1" value="5">
-              <select id="periodUnit">
-                <option value="years" selected>роки</option>
-                <option value="months">місяці</option>
-              </select>
+              <div class="unit-wrap">
+                <!-- Таби (>=560px) -->
+                <div class="unit-tabs" id="unitTabs" role="tablist" aria-label="Одиниця">
+                  <button type="button" class="unit-tab" data-unit="years" aria-pressed="true">роки</button>
+                  <button type="button" class="unit-tab" data-unit="months" aria-pressed="false">місяці</button>
+                </div>
+                <!-- Селект (<560px) -->
+                <select id="periodUnit" class="unit-select">
+                  <option value="years" selected>роки</option>
+                  <option value="months">місяці</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -152,7 +188,7 @@
         </div>
       </section>
 
-      <!-- Результат -->
+      <!-- ===== Results / Chart / Table ===== -->
       <section class="card results">
         <div><span class="badge">Результат</span></div>
         <div class="result-box">
@@ -162,7 +198,12 @@
 
         <div class="chart-card">
           <div class="hint" style="margin-bottom:6px">Графік зростання балансу (номінал)</div>
-          <canvas id="chart" width="900" height="300"></canvas>
+
+          <div id="chartWrap">
+            <canvas id="chart" width="900" height="300"></canvas>
+            <div id="chartTip" hidden></div>
+          </div>
+
           <div class="hint" style="margin-top:6px">
             <span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px">
               <span style="width:14px;height:3px;background:var(--brand-1);display:inline-block;border-radius:3px"></span> Баланс
@@ -189,45 +230,47 @@
       </section>
     </div>
 
-    <!-- CTA -->
+    <!-- ===== CTA ===== -->
     <section class="cta" style="margin:16px 0">
       <div style="font-size:18px;font-weight:800">Потрібен персональний розбір портфеля?</div>
-      <div>Отримайте консультацію від Крістіни — підбір стратегії, розрахунок цілей і ризик-профілю.</div>
+      <div>Отримайте консультацію від експертів Active Invest School — підбір стратегії, розрахунок цілей і ризик-профілю.</div>
       <a class="btn" href="https://www.instagram.com/stories/kristina_bessolova" target="_blank" rel="noopener">Отримати консультацію</a>
     </section>
 
-    <!-- FAQ -->
-    <section class="faq" style="margin:16px 0">
-      <h2 style="font-size:20px;margin:0 0 8px">Міні-FAQ: складний відсоток</h2>
-      <details>
-        <summary>Що таке складний відсоток?</summary>
+    <!-- ===== FAQ ===== -->
+    <section class="card" style="margin:16px 0">
+      <h2 style="margin:0 0 8px; font-size:20px">Міні-FAQ: складний відсоток</h2>
+      <details style="border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--panel)">
+        <summary style="cursor:pointer; font-weight:700">Що таке складний відсоток?</summary>
         <div class="hint" style="margin-top:8px">
-          Це коли відсотки додаються до тіла інвестиції й у наступних періодах відсотки нараховуються вже на більшу суму (відсотки на відсотки).
+          Відсотки додаються до тіла інвестиції, і далі нараховуються вже на більшу суму — «відсотки на відсотки».
         </div>
       </details>
-      <details>
-        <summary>Чим капіталізація відрізняється від внесків?</summary>
+      <details style="border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--panel); margin-top:10px">
+        <summary style="cursor:pointer; font-weight:700">Чим капіталізація відрізняється від внесків?</summary>
         <div class="hint" style="margin-top:8px">
-          Внески — **щомісячні**. Капіталізація визначає **коли** нараховуються % (1/2/4/12 разів на рік). Частіша капіталізація = швидше зростання.
+          Внески — завжди щомісячні. Капіталізація визначає, коли саме нараховуються % (1/2/4/12 разів на рік). Частіша капіталізація = швидше зростання.
         </div>
       </details>
-      <details>
-        <summary>Чому результати відрізняються між «місячно» і «річно»?</summary>
+      <details style="border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--panel); margin-top:10px">
+        <summary style="cursor:pointer; font-weight:700">Чому «місячно» дає більше, ніж «річно»?</summary>
         <div class="hint" style="margin-top:8px">
-          При місячній капіталізації відсотки частіше додаються до балансу, тому працює ефект «відсоток на відсоток» частіше → підсумок більший.
+          Бо відсотки частіше додаються до балансу — ефект «складних %» працює частіше.
         </div>
       </details>
     </section>
   </main>
 
-  <footer>© Active Invest School. Освітній інструмент (не інвестрекомендація).</footer>
+  <footer class="wrap" style="text-align:center; font-size:12px; color:var(--muted); padding:20px 0">
+    © Active Invest School. Освітній інструмент (не інвестрекомендація).
+  </footer>
 
 <script>
 /* ===== Формат грошей ===== */
 const fmtMoney = (x, cur='UAH') =>
   new Intl.NumberFormat('uk-UA', { style:'currency', currency:cur, maximumFractionDigits:2 }).format(x);
 
-/* ===== Сервісні ===== */
+/* ===== Допоміжні ===== */
 function monthsTotal(unit, count){
   if (unit === 'months') return count;
   if (unit === 'years')  return count * 12;
@@ -235,12 +278,11 @@ function monthsTotal(unit, count){
 }
 
 /* ===== Модель компаундингу =====
-   - Щомісячний внесок (PMT) — завжди.
-   - Відсотки нараховуються кожні (12/m) місяців за ставкою (r/m).
-   - Повертаємо: final, rows (12 міс), series (усі місяці) для графіка.
+   - щомісячний внесок (PMT) — завжди;
+   - нарахування % кожні (12/m) місяців за ставкою (r/m).
 */
 function simulate({P0, PMT, annualRate, m, months}){
-  const intervalMonths = Math.round(12 / m);   // 12→1, 4→3, 2→6, 1→12
+  const intervalMonths = Math.round(12 / m); // 12→1, 4→3, 2→6, 1→12
   const iPeriod = annualRate / m;
 
   let balance = P0;
@@ -253,7 +295,7 @@ function simulate({P0, PMT, annualRate, m, months}){
     // 1) щомісячний внесок
     balance += PMT;
 
-    // 2) нарахування % наприкінці періоду капіталізації
+    // 2) відсотки наприкінці періоду капіталізації
     let interestAdded = 0;
     if (t % intervalMonths === 0){
       const interest = balance * iPeriod;
@@ -262,65 +304,124 @@ function simulate({P0, PMT, annualRate, m, months}){
     }
 
     if (t <= 12){
-      rows.push({month:t, begin, pmt:PMT, interest:interestAdded, end:balance});
+      rows.push({ month:t, begin, pmt:PMT, interest:interestAdded, end:balance });
     }
     series.push(balance);
   }
   return { final: balance, rows, series };
 }
 
-/* ===== Графік (Canvas) ===== */
-function drawChart(series){
+/* ===== Графік (лінія + заливка + грід + тултіп) ===== */
+function drawChart(series, currency){
   const canvas = document.getElementById('chart');
+  const tip = document.getElementById('chartTip');
   const ctx = canvas.getContext('2d');
 
   // Retina
   const dpr = window.devicePixelRatio || 1;
   canvas.width = canvas.clientWidth * dpr;
   canvas.height = canvas.clientHeight * dpr;
-  ctx.scale(dpr, dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
 
   const w = canvas.clientWidth, h = canvas.clientHeight;
   ctx.clearRect(0,0,w,h);
 
-  const padL = 48, padR = 12, padT = 12, padB = 28;
+  const padL=48, padR=16, padT=12, padB=32;
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
 
-  const len = series.length;
+  const len = Math.max(series.length, 2);
   const min = Math.min(...series);
   const max = Math.max(...series);
   const yMin = Math.max(0, Math.floor(min));
   const yMax = Math.ceil(max);
 
-  const X = (i)=> padL + ( (w - padL - padR) * (i / (len - 1 || 1)) );
-  const Y = (v)=> padT + (h - padT - padB) * (1 - (v - yMin) / (yMax - yMin || 1));
+  const X = i => padL + plotW * (i / (len - 1));
+  const Y = v => padT + plotH * (1 - (v - yMin) / (yMax - yMin || 1));
 
   // grid
   ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--line');
   ctx.lineWidth = 1;
   ctx.beginPath();
-  for (let k=0; k<=4; k++){
-    const y = padT + (h - padT - padB) * (k/4);
-    ctx.moveTo(padL, y); ctx.lineTo(w - padR, y);
-  }
+  for(let k=0;k<=4;k++){ const y = padT + plotH*(k/4); ctx.moveTo(padL,y); ctx.lineTo(w-padR,y); }
   ctx.stroke();
 
   // y labels
   ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--ink');
   ctx.font = '12px Inter, system-ui, sans-serif';
   ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-  for (let k=0; k<=4; k++){
-    const v = yMax - (yMax - yMin) * (k/4);
-    const y = padT + (h - padT - padB) * (k/4);
-    ctx.fillText(shortNum(v), padL - 6, y);
+  for(let k=0;k<=4;k++){
+    const v = yMax - (yMax-yMin)*(k/4);
+    const y = padT + plotH*(k/4);
+    ctx.fillText(shortNum(v), padL-6, y);
   }
 
+  // x labels by years (every 12 months)
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  const monthsTotal = len-1;
+  const years = Math.max(1, Math.round(monthsTotal/12));
+  for(let y=0; y<=years; y++){
+    const i = Math.min(monthsTotal, y*12);
+    const x = X(i);
+    ctx.fillText((y)+'р', x, h-padB+8);
+  }
+
+  // area gradient
+  const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--brand-1').trim() || '#0b8a4b';
+  const grad = ctx.createLinearGradient(0, padT, 0, h-padB);
+  grad.addColorStop(0, hexToRgba(lineColor, 0.35));
+  grad.addColorStop(1, hexToRgba(lineColor, 0.00));
+
+  ctx.beginPath();
+  ctx.moveTo(X(0), Y(series[0]));
+  for(let i=1;i<len;i++) ctx.lineTo(X(i), Y(series[i]));
+  ctx.lineTo(X(len-1), h-padB);
+  ctx.lineTo(X(0), h-padB);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
   // line
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--brand-1').trim() || '#0b8a4b';
+  ctx.strokeStyle = lineColor;
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(X(0), Y(series[0]));
-  for (let i=1; i<series.length; i++) ctx.lineTo(X(i), Y(series[i]));
+  for(let i=1;i<len;i++) ctx.lineTo(X(i), Y(series[i]));
   ctx.stroke();
+
+  // збережемо «базову» картинку для швидкого перемальовування при наведенні
+  const base = ctx.getImageData(0,0,canvas.width/dpr,canvas.height/dpr);
+
+  // hover
+  canvas.onmousemove = (e)=>{
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left);
+    const i = Math.max(0, Math.min(len-1, Math.round((x - padL) / (plotW/(len-1)))));
+    const cx = X(i), cy = Y(series[i]);
+
+    // відновити базу
+    ctx.putImageData(base, 0, 0);
+
+    // guide
+    ctx.strokeStyle = '#ffffff33';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx, padT); ctx.lineTo(cx, h-padB);
+    ctx.stroke();
+
+    // point
+    ctx.fillStyle = lineColor;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI*2);
+    ctx.fill();
+
+    // tooltip
+    tip.hidden = false;
+    tip.textContent = `${fmtMoney(series[i], currency)} • ${i} міс.`;
+    tip.style.left = `${cx}px`;
+    tip.style.top  = `${cy}px`;
+  };
+  canvas.onmouseleave = ()=>{ tip.hidden = true; ctx.putImageData(base, 0, 0); };
 
   function shortNum(v){
     if (v >= 1e9) return (v/1e9).toFixed(1)+'B';
@@ -328,6 +429,27 @@ function drawChart(series){
     if (v >= 1e3) return (v/1e3).toFixed(0)+'k';
     return Math.round(v).toString();
   }
+  function hexToRgba(hex, a){
+    const h = hex.replace('#','');
+    const bigint = parseInt(h.length===3 ? h.replace(/(.)/g,'$1$1') : h, 16);
+    const r = (bigint>>16)&255, g=(bigint>>8)&255, b=bigint&255;
+    return `rgba(${r},${g},${b},${a})`;
+  }
+}
+
+/* ===== Таби / селект одиниці (роки/місяці) ===== */
+let unitCurrent = 'years';
+document.querySelectorAll('.unit-tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    unitCurrent = btn.dataset.unit;
+    document.getElementById('periodUnit').value = unitCurrent;
+    document.querySelectorAll('.unit-tab').forEach(b=>b.setAttribute('aria-pressed', b===btn ? 'true' : 'false'));
+  });
+});
+function getUnit(){
+  return window.matchMedia('(min-width:560px)').matches
+    ? unitCurrent
+    : document.getElementById('periodUnit').value;
 }
 
 /* ===== Контролер ===== */
@@ -337,7 +459,7 @@ function calc(){
   const PMT  = +document.getElementById('pmt').value || 0;
   const r    = (+document.getElementById('rate').value || 0) / 100;
   const m    = +document.getElementById('m').value;
-  const unit = document.getElementById('periodUnit').value;
+  const unit = getUnit();
   const count= +document.getElementById('periodCount').value;
   const months = monthsTotal(unit, count);
 
@@ -347,7 +469,6 @@ function calc(){
   document.getElementById('resHorizon').textContent = horizonLabel;
   document.getElementById('resAmount').textContent  = fmtMoney(final, currency);
 
-  // таблиця
   const tb = document.querySelector('#preview tbody');
   tb.innerHTML = rows.map(r => `
     <tr>
@@ -359,8 +480,7 @@ function calc(){
     </tr>
   `).join('');
 
-  // графік
-  drawChart(series);
+  drawChart(series, currency);
 }
 
 function resetForm(){
@@ -371,14 +491,19 @@ function resetForm(){
   document.getElementById('rate').value = '8';
   document.getElementById('periodCount').value = '5';
   document.getElementById('periodUnit').value = 'years';
+  unitCurrent = 'years';
+  document.querySelectorAll('.unit-tab').forEach(b=>b.setAttribute('aria-pressed', b.dataset.unit==='years'?'true':'false'));
   document.querySelector('#preview tbody').innerHTML = '';
   document.getElementById('resHorizon').textContent = '—';
   document.getElementById('resAmount').textContent = '—';
-  drawChart([0,0,0]); // очистити графік
+  drawChart([0,0,0], 'USD');
 }
 
 document.getElementById('calcBtn').addEventListener('click', calc);
 document.getElementById('resetBtn').addEventListener('click', resetForm);
+
+// ініціалізація графіка (порожній)
+window.addEventListener('load', ()=> drawChart([0,0,0], 'USD'));
 </script>
 </body>
 </html>
